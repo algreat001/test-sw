@@ -41,8 +41,6 @@ export const filmInfoSlice = createSlice({
   },
 });
 
-//export const { increment, decrement, incrementByAmount } = filmInfoSlice.actions;
-
 export const selectFilmInfo = (state) => state.filmInfo.value;
 export const selectFilmInfoStatus = (state) => state.filmInfo.status;
 
