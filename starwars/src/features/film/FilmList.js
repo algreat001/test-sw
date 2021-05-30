@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CircularProgress, MenuList, MenuItem} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector, useDispatch  } from 'react-redux';
 
+
+import {
+  loafFilmListAsync,
+  selectFilmList,
+  selectFilmListStatus,
+} from './slices/filmListSlice';
 
 const useStyles = makeStyles({
   root: {
@@ -15,21 +22,25 @@ const useStyles = makeStyles({
 
 export function FilmList(props) {
 
-  const [films, setFilms] = useState(null);
-  useEffect(() => {
-    fetch('https://swapi.dev/api/films/')
-    .then(response => response.json() )
-    .then(data => { 
-      if (data && data.results) { setFilms(data.results); }
-    });
-  }, []);
+  const dispatch = useDispatch();
+  const films = useSelector(selectFilmList);
+  const status = useSelector(selectFilmListStatus);
+  const [selectItem, setSelectItem] = useState(null);
 
-
+  useEffect( () => {
+    dispatch(loafFilmListAsync());
+  }, [dispatch]);
 
   const classes = useStyles();
 
-  const listItems = (films) ? films.map( (item, inx) =>
-  (<MenuItem onClick={(e) => { props.onChangeFilm(item.url); } } key={inx} >{item.title}</MenuItem>)) : (<CircularProgress />);
+  const clickHandler = (inx, url) => {
+    setSelectItem(inx);
+    props.onChangeFilm(url);
+  }
+
+
+  const listItems = (status==='idle') ? films.map( (item, inx) =>
+  (<MenuItem onClick={(e) => clickHandler(inx,item.url) } key={inx} selected={selectItem===inx} >{item.title}</MenuItem>)) : (<CircularProgress />);
 
   return (
       <MenuList className={classes.root}>

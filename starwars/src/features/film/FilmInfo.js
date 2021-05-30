@@ -1,9 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Grid, Button } from '@material-ui/core';
 import Skeleton from '@material-ui/lab/Skeleton';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { useSelector, useDispatch  } from 'react-redux';
 
+import {
+    loafFilmInfoAsync,
+    selectFilmInfo,
+    selectFilmInfoStatus,
+  } from './slices/filmInfoSlice';
 
 const useStyles = makeStyles({
   root: {
@@ -24,56 +30,38 @@ const useStyles = makeStyles({
   }  
 });
 
-
-
 export function FilmInfo(props) {
 
-  const [is_loading, setIsLoading] = useState(false);
-  const [logo, setLogo] = useState(null);
-  const [info, setInfo] = useState(null);
-  const [header, setHeader] = useState(null);
-  //const [url, setURL] = useState(null);
-
-  useMemo(() => {
-    if (props.film) setIsLoading(true);
-
-    if (props.film)
-        fetch(props.film)
-        .then(response => response.json() )
-        .then(data => { 
-        if (data) { 
-            setInfo(data.opening_crawl);  
-            //в аpi нет лого и вообще ссылок на картинки
-            setLogo('https://logos-download.com/wp-content/uploads/2016/09/Star_Wars_logo.svg'); 
-            setHeader(data.title);
-            //setURL(data.url);
-        }
-        setIsLoading(false);
-        });
-
-  }, [props.film]);
+  const dispatch = useDispatch();
+  const filmInfo = useSelector(selectFilmInfo);
+  const status = useSelector(selectFilmInfoStatus);
 
   const classes = useStyles();
 
+  useMemo(() => {
+    if (props.film) dispatch(loafFilmInfoAsync(props.film));
+  }, [props.film, dispatch]);
+
+
   return (
         <Grid>
-            {!is_loading && logo &&
+            {status==='idle' &&
                 <>
                 <Grid item>
-                    {logo && <img alt='logo' src={logo} className={classes.logo} />}
+                    <img alt='logo' src={filmInfo.logo} className={classes.logo} />
                 </Grid>
                 <Grid item>
-                    <h2>{header}</h2>
+                    <h2>{filmInfo.title}</h2>
                 </Grid>
                 <Grid item>
-                    {info}
+                    {filmInfo.info}
                 </Grid>
                 <Grid item>
                     <Button className={classes.write}  variant="contained" color="primary" onClick={() => { props.onWriteReview(true); } }>Написать рецензию</Button>
                 </Grid>
                 </>
             }
-            {is_loading && 
+            {status==='loading' && 
             <>
                 <Skeleton variant="text" width={210} />
                 <Skeleton variant="circle" width={40} height={40} />
