@@ -32,13 +32,10 @@ export function Review(props) {
   const review = useSelector(selectReview);
   const status = useSelector(selectReviewStatus);
 
-  useEffect(()=>{
-    if (status==='idle') { showSnack(true); console.log(review); }
-  }, [status, review]);
-
-  const handleSave = (data) => {
+    const handleSave = (data) => {
     props.onClose();
-    dispatch(saveReviewAsync( {film: props.film, data: data} ));
+    dispatch(saveReviewAsync( {film: props.film, data: data} ))
+      .then(() => { showSnack(true); console.log(review); });
   }
 
   const classes = useStyles();
