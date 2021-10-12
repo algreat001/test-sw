@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useState } from 'react';
 import { Dialog, Snackbar } from '@material-ui/core';
 import MuiAlert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
@@ -6,8 +6,8 @@ import { useSelector, useDispatch  } from 'react-redux';
 
 import {
   saveReviewAsync,
-  selectReview,
-  selectReviewStatus,
+  //selectReview,
+  //selectReviewStatus,
 } from './slices/reviewSlice';
 
 const FormReview = React.lazy(() => import('./FormReview'));
@@ -23,19 +23,18 @@ const useStyles = makeStyles({
   },
 });
 
-
 export function Review(props) {
 
   const [snack, showSnack] = useState(false);
 
   const dispatch = useDispatch();
-  const review = useSelector(selectReview);
-  const status = useSelector(selectReviewStatus);
+  //const review = useSelector(selectReview);
+  //const status = useSelector(selectReviewStatus);
 
-    const handleSave = (data) => {
+  const handleSave = (data) => {
     props.onClose();
     dispatch(saveReviewAsync( {film: props.film, data: data} ))
-      .then(() => { showSnack(true); console.log(review); });
+      .then((res) => { showSnack(true); console.log(res); });
   }
 
   const classes = useStyles();
